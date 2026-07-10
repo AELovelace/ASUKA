@@ -1,0 +1,31 @@
+flowchart TD
+    setup([setup]) --> routeRoot["server.on('/', handleRoot)"]
+    setup --> routeText["server.on('/get-text', handleText)"]
+    setup --> beginServer["server.begin()"]
+    loop([loop]) --> handleClient["server.handleClient()"]
+    handleClient -. routes .-> handleRoot([handleRoot])
+    handleClient -. routes .-> handleText([handleText])
+
+    handleText --> addUser["addToHistory('User', inputLine)"]
+    handleText --> collapseHistory([collapseHistory])
+    handleText --> askLLM([askLLM])
+    handleText --> addLLM["addToHistory('LLM', llmOutput)"]
+
+    addUser --> addToHistory([addToHistory])
+    addLLM --> addToHistory
+    addToHistory --> printHistory([printHistory])
+
+    askLLM --> buildDecision[buildToolDecisionPrompt]
+    askLLM --> stream1[streamLLMResponse]
+    askLLM --> looksLikeToolCall([looksLikeToolCall])
+    askLLM --> handleToolCall([handleToolCall])
+    askLLM --> buildFollowup[buildToolFollowupPrompt]
+    askLLM --> stream2[streamLLMResponse]
+
+    stream1 --> extractContent([extractContent])
+    stream1 --> closeConnection([closeConnection])
+    stream2 --> extractContent
+    stream2 --> closeConnection
+
+    handleToolCall --> braveSearch([braveSearch])
+    braveSearch --> urlEncode([urlEncode])

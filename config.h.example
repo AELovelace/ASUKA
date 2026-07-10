@@ -1,0 +1,20 @@
+#pragma once
+
+const char* ssid = ""; // wifi network name
+const char* password = ""; // wifi password
+const char* llmHost = ""; // llm server host or ip
+uint16_t llmPort = 9090; // llm server port
+const char* llmPath = "/v1/chat/completions";
+const char* BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search";
+const int SEARCH_RESULT_COUNT = 5;
+const char* BRAVE_API_KEY = ""; // brave search api token
+const char* OPENWEATHER_WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
+const char* OPENWEATHER_API_KEY = ""; // OpenWeatherMap api token
+const char* OPENWEATHER_LOCATION_LABEL = "Kennewick, Washington, US"; // label returned for the fixed weather lookup location
+const double OPENWEATHER_LAT = 46.2112; // fixed latitude for weather lookups
+const double OPENWEATHER_LON = -119.1372; // fixed longitude for weather lookups
+const char* SYSTEM_PROMPT = 
+  "You are Mochi, an assistant running on an ESP32" // base assistant identity prompt
+  "Be concise, admit uncertainty" // response-style guidance
+  "if live web lookup is unavailable, say so clearly."; // tool-availability guidance
+

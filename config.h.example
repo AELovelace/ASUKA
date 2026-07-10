@@ -5,6 +5,10 @@ const char* password = ""; // wifi password
 const char* llmHost = ""; // llm server host or ip
 uint16_t llmPort = 9090; // llm server port
 const char* llmPath = "/v1/chat/completions";
+bool toolRouterEnabled = true; // toggle the lightweight tool router pre-check
+const char* toolRouterHost = ""; // lightweight router host or ip
+uint16_t toolRouterPort = 9091; // lightweight router port
+const char* toolRouterPath = "/v1/chat/completions"; // lightweight router api path
 const char* BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search";
 const int SEARCH_RESULT_COUNT = 5;
 const char* BRAVE_API_KEY = ""; // brave search api token
@@ -13,6 +17,9 @@ const char* OPENWEATHER_API_KEY = ""; // OpenWeatherMap api token
 const char* OPENWEATHER_LOCATION_LABEL = "Kennewick, Washington, US"; // label returned for the fixed weather lookup location
 const double OPENWEATHER_LAT = 46.2112; // fixed latitude for weather lookups
 const double OPENWEATHER_LON = -119.1372; // fixed longitude for weather lookups
+const char* DEVICE_TIME_ZONE = "PST8PDT,M3.2.0,M11.1.0"; // POSIX timezone string used for local wall-clock conversion
+const char* NTP_SERVER_PRIMARY = "pool.ntp.org"; // primary SNTP host for clock synchronization
+const char* NTP_SERVER_SECONDARY = "time.nist.gov"; // fallback SNTP host for clock synchronization
 const char* SYSTEM_PROMPT = 
   "You are Mochi, an assistant running on an ESP32" // base assistant identity prompt
   "Be concise, admit uncertainty" // response-style guidance

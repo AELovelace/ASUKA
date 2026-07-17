@@ -44,8 +44,20 @@ String buildToolRoutingPrompt(const String& message) {
   String prompt =
     "You are a lightweight router that decides whether the main assistant needs a live tool before answering. "
     "Reply with exactly one uppercase word: TOOL or DIRECT. "
-    "Reply TOOL if the user needs current or changing information, wants you to inspect a specific URL or web page, asks for web search, asks for the current local date or time, or needs current weather. "
-    "Reply DIRECT if normal knowledge and reasoning are enough. "
+    "Default to TOOL whenever the answer could depend on real-time, recent, or frequently-changing information, wants you to inspect a specific URL or web page, or needs the current local date, time, or weather. "
+    "The user does not need to explicitly say \"search\" or \"look up\" for this to apply. "
+    "Reply DIRECT only for stable facts, general knowledge, math, definitions, code, or creative/conversational requests that do not depend on anything happening right now. "
+    "Examples: "
+    "\"who won the game last night\" -> TOOL. "
+    "\"what's the score of the lakers game\" -> TOOL. "
+    "\"what's the latest version of node.js\" -> TOOL. "
+    "\"what's bitcoin trading at right now\" -> TOOL. "
+    "\"what's today's date\" -> TOOL. "
+    "\"search for the nearest coffee shop\" -> TOOL. "
+    "\"what's the capital of france\" -> DIRECT. "
+    "\"write me a haiku about the ocean\" -> DIRECT. "
+    "\"explain how a binary search works\" -> DIRECT. "
+    "\"what's 15% of 240\" -> DIRECT. "
     "If unsure, reply TOOL. User request: ";
 
   return prompt + message;
@@ -288,7 +300,7 @@ bool streamLLMResponse(const String& message, String& responseOut, bool publishP
   }
 
   WiFiClient client; // plain TCP client for the local LLM endpoint
-  if (!client.connect(llmHost, llmPort)) {
+  if (!client.connect(llmHost.c_str(), llmPort)) {
     Serial.println("Connecting to Monolith Failed"); // report connection failure on serial
     return false; // stop before attempting to write a request
   }

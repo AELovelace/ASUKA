@@ -2,9 +2,13 @@
 
 const char* ssid = ""; // wifi network name
 const char* password = ""; // wifi password
-const char* llmHost = ""; // llm server host or ip
+String llmHost = ""; // llm server host or ip; mutable so the MQTT "ip" topic can repoint it at runtime
 uint16_t llmPort = 9090; // llm server port
 const char* llmPath = "/v1/chat/completions";
+const char* MQTT_BROKER_HOST = ""; // broker that publishes ask/port/ip/clear control messages
+uint16_t MQTT_BROKER_PORT = 1883; // standard unencrypted MQTT port
+const char* MQTT_CLIENT_ID = "ASUKA"; // client identifier presented to the broker
+const uint8_t STATUS_LED_PIN = 48; // onboard addressable status LED data pin
 bool toolRouterEnabled = true; // toggle the lightweight tool router pre-check
 const char* toolRouterHost = ""; // lightweight router host or ip
 uint16_t toolRouterPort = 9091; // lightweight router port

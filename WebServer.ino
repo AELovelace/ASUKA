@@ -402,6 +402,7 @@ void runLLMWorkerTask(void* parameter) {
     }
 
     addToHistory("LLM", responseText);
+    publishLlmResponseToMqtt(responseText); // mirror every completed reply back out over MQTT
   }
 }
 

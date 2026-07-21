@@ -536,6 +536,64 @@ void printHistory() {
     }
   }
 }
+
+void clearConversationHistory() {
+  if (chatStateMutex != nullptr) {
+    xSemaphoreTake(chatStateMutex, portMAX_DELAY); // keep the shared history snapshot consistent while clearing it
+  }
+
+  for (int i = 0; i < 6; i++) {
+    contextWindow[i] = "";
+  }
+
+  contextCollapsed = "";
+
+  if (!llmRequestInFlight) {
+    llmOutput = ""; // preserve any streamed preview if a request is currently still running
+  }
+
+  if (chatStateMutex != nullptr) {
+    xSemaphoreGive(chatStateMutex);
+  }
+}
+
+bool submitChatMessage(const String& message, const char* sourceName) {
+  if (message.length() == 0) {
+    return false; // ignore empty submissions from every interface
+  }
+
+  if (llmTaskHandle == nullptr) {
+    if (chatStateMutex != nullptr) {
+      xSemaphoreTake(chatStateMutex, portMAX_DELAY);
+      llmOutput = "LLM worker is unavailable.";
+      llmRequestInFlight = false;
+      xSemaphoreGive(chatStateMutex);
+    } else {
+      llmOutput = "LLM worker is unavailable.";
+      llmRequestInFlight = false;
+    }
+
+    return false;
+  }
+
+  if (isLLMRequestRunning()) {
+    Serial.print(sourceName);
+    Serial.println(" message ignored: LLM request already in flight.");
+    return false; // prevent one interface from clobbering another interface's active request
+  }
+
+  addToHistory("User", message); // keep all front-ends in the same rolling conversation buffer
+  Serial.print(sourceName);
+  Serial.print(" message: ");
+  Serial.println(message);
+
+  collapseHistory(); // rebuild the quoted transcript passed to the model
+  String promptToSend = contextCollapsed;
+  contextCollapsed = "";
+
+  return queueLLMRequest(promptToSend);
+}
+
 void collapseHistory(){
   if (chatStateMutex != nullptr) {
     xSemaphoreTake(chatStateMutex, portMAX_DELAY); // snapshot the current rolling history without racing a background completion

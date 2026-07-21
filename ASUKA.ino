@@ -25,6 +25,20 @@ bool deviceClockReady() {
   return time(nullptr) >= 1700000000; // treat obviously pre-NTP epochs as unsynchronized
 }
 
+void configureWiFiNetworking() {
+  if (!WIFI_USE_STATIC_IP) {
+    Serial.println("Wi-Fi network config: DHCP"); // leave the station interface on DHCP when static addressing is disabled
+    return;
+  }
+
+  Serial.print("Wi-Fi static IP: "); // log the full requested IPv4 config before association for easier field debugging
+  Serial.println(WIFI_STATIC_IP);
+
+  if (!WiFi.config(WIFI_STATIC_IP, WIFI_GATEWAY, WIFI_SUBNET, WIFI_DNS_PRIMARY, WIFI_DNS_SECONDARY)) {
+    Serial.println("Applying static Wi-Fi config failed; continuing with DHCP fallback.");
+  }
+}
+
 void syncDeviceClock() {
   configTzTime(DEVICE_TIME_ZONE, NTP_SERVER_PRIMARY, NTP_SERVER_SECONDARY); // start SNTP with the configured local timezone rules
 
@@ -48,6 +62,7 @@ void setup() {
 
   Serial.println("DEBUG: calling WiFi.begin"); // TEMP DEBUG
   Serial.flush(); // TEMP DEBUG
+  configureWiFiNetworking(); // choose either the configured static address or DHCP before associating
   WiFi.begin(ssid, password);   //start wifi
 
   while (WiFi.status() != WL_CONNECTED) {   //while wifi not connected
@@ -86,6 +101,7 @@ void setup() {
   Serial.println("DEBUG: starting web server"); // TEMP DEBUG
   // Start the server
   server.begin(); // start listening for HTTP requests
+  initTelnetServer(); // start the optional telnet console after Wi-Fi is up
   Serial.println("DEBUG: setup() complete"); // TEMP DEBUG
 }
 
@@ -96,6 +112,7 @@ void loop() {
     loggedFirstLoop = true; // TEMP DEBUG
   }
   server.handleClient(); // process one pending HTTP client at a time
+  handleTelnetServer(); // process the optional telnet console alongside the web UI
   maintainMqttConnection(); // keep the MQTT subscription alive and process inbound messages
   updateStatusLed(); // reflect current Wi-Fi/processing/MQTT-activity state on the onboard LED
 }

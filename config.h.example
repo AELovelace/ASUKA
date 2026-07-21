@@ -2,12 +2,20 @@
 
 const char* ssid = ""; // wifi network name
 const char* password = ""; // wifi password
+const bool WIFI_USE_STATIC_IP = true; // when true, apply the static IPv4 settings below before connecting
+IPAddress WIFI_STATIC_IP(192, 168, 44, 5); // preferred LAN address for ASUKA
+IPAddress WIFI_GATEWAY(192, 168, 44, 1); // default gateway/router for the Wi-Fi network
+IPAddress WIFI_SUBNET(255, 255, 255, 0); // subnet mask for the Wi-Fi network
+IPAddress WIFI_DNS_PRIMARY(192, 168, 44, 1); // primary DNS server used after Wi-Fi connects
+IPAddress WIFI_DNS_SECONDARY(1, 1, 1, 1); // fallback DNS server used after Wi-Fi connects
 String llmHost = ""; // llm server host or ip; mutable so the MQTT "ip" topic can repoint it at runtime
 uint16_t llmPort = 9090; // llm server port
 const char* llmPath = "/v1/chat/completions";
 const char* MQTT_BROKER_HOST = ""; // broker that publishes ask/port/ip/clear control messages
 uint16_t MQTT_BROKER_PORT = 1883; // standard unencrypted MQTT port
 const char* MQTT_CLIENT_ID = "ASUKA"; // client identifier presented to the broker
+const bool TELNET_SERVER_ENABLED = true; // expose a simple line-oriented console over telnet when enabled
+const uint16_t TELNET_SERVER_PORT = 23; // telnet port used for the interactive ASUKA console
 const uint8_t STATUS_LED_PIN = 48; // onboard addressable status LED data pin
 bool toolRouterEnabled = true; // toggle the lightweight tool router pre-check
 const char* toolRouterHost = ""; // lightweight router host or ip

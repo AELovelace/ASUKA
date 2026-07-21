@@ -423,11 +423,21 @@ bool queueLLMRequest(const String& promptText) {
 
   if (chatStateMutex != nullptr) {
     xSemaphoreTake(chatStateMutex, portMAX_DELAY);
+
+    if (llmRequestInFlight) {
+      xSemaphoreGive(chatStateMutex);
+      return false; // refuse to overwrite an active prompt with a second queued request
+    }
+
     pendingLLMPrompt = promptText;
     llmOutput = "";
     llmRequestInFlight = true;
     xSemaphoreGive(chatStateMutex);
   } else {
+    if (llmRequestInFlight) {
+      return false;
+    }
+
     pendingLLMPrompt = promptText;
     llmOutput = "";
     llmRequestInFlight = true;
@@ -546,15 +556,7 @@ void handleRoot() {
       return;
     }
 
-    addToHistory("User", inputLine); // store the user turn in the rolling history window
-    Serial.print("Received Text: "); // label the inbound message in serial output
-    Serial.println(inputLine); // print the inbound message contents
-
-    collapseHistory(); // rebuild the quoted chat history string for the prompt
-    String promptToSend = contextCollapsed; // snapshot the collapsed prompt before the background task clears it
-    contextCollapsed = ""; // clear the collapsed prompt buffer after the request completes
-
-    if (!queueLLMRequest(promptToSend)) {
+    if (!submitChatMessage(inputLine, "Web")) {
       server.send(500, "text/html", buildMainPageHtml());
       return;
     }

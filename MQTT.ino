@@ -21,15 +21,9 @@ void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
   const String topicName(topic);
 
   if (topicName == "ask") {
-    if (message.length() == 0) {
-      return;
+    if (!submitChatMessage(message, "MQTT")) {
+      Serial.println("MQTT ask ignored because the request could not be queued.");
     }
-
-    addToHistory("User", message); // keep MQTT prompts in the same rolling history as web chat turns
-    collapseHistory();
-    String promptToSend = contextCollapsed;
-    contextCollapsed = "";
-    queueLLMRequest(promptToSend);
     return;
   }
 
@@ -71,19 +65,7 @@ void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
   }
 
   if (topicName == "clear") {
-    if (chatStateMutex != nullptr) {
-      xSemaphoreTake(chatStateMutex, portMAX_DELAY);
-    }
-
-    for (int i = 0; i < 6; i++) {
-      contextWindow[i] = "";
-    }
-    contextCollapsed = "";
-
-    if (chatStateMutex != nullptr) {
-      xSemaphoreGive(chatStateMutex);
-    }
-
+    clearConversationHistory();
     Serial.println("Context window cleared via MQTT.");
     return;
   }

@@ -1,3 +1,7 @@
 secrets.ino
 settings.ino
 config.h
+fix-claude-machine-cert-store-result.json
+cert-backup-currentuser-root-20260721-claude-fix
+cert-backup-machine-root-authroot-20260721-claude-fix
+fix-claude-machine-cert-store.ps1
